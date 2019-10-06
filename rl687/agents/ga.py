@@ -42,15 +42,15 @@ class GA(BBOAgent):
         self.numEpisodes = numEpisodes
         self.initPopulationFunction = initPopulationFunction
 
-        for candidate in self._population:
-            print ("Evaluating Candidate")
-            J = self.evaluationFunction(candidate, self.numEpisodes)
-            print ("Return", J)
-            if J > self.bestReturn:
-                print ("Better Policy Found!")
-                self.bestReturn = J
-                self._parameters = candidate
-        print (self._population, self._parameters, self.bestReturn)
+        # for candidate in self._population:
+        #     print ("Evaluating Candidate")
+        #     J = self.evaluationFunction(candidate, self.numEpisodes)
+        #     print ("Return", J)
+        #     if J > self.bestReturn:
+        #         print ("Better Policy Found!")
+        #         self.bestReturn = J
+        #         self._parameters = candidate
+        # print (self._population, self._parameters, self.bestReturn)
 
         self.numTruncate = numTruncate
         self.alpha = alpha
@@ -117,11 +117,11 @@ class GA(BBOAgent):
         self._population = self.initPopulationFunction(self.populationSize)
         self._parameters = np.zeros_like(self._population[1])
         self.bestReturn = -np.inf
-        for candidate in self._population:
-            print ("Evaluating Candidate")
-            J = self.evaluationFunction(candidate, self.numEpisodes)
-            print ("Return", J)
-            if J > self.bestReturn:
-                print ("Better Policy Found!")
-                self.bestReturn = J
-                self._parameters = candidate
+        # for candidate in self._population:
+        #     print ("Evaluating Candidate")
+        #     J = self.evaluationFunction(candidate, self.numEpisodes)
+        #     print ("Return", J)
+        #     if J > self.bestReturn:
+        #         print ("Better Policy Found!")
+        #         self.bestReturn = J
+        #         self._parameters = candidate

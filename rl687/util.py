@@ -43,14 +43,18 @@ class GridworldEvaluation:
 	    print("Mean Return ", np.mean(G))
 	    return np.mean(G)
 
-	def plot(self):
+	def plot(self, filename:str="plot.png", show:bool=False):
 		numEpisodes = len(self.returns[0])
 		# print (self.numTrial, numEpisodes)
 		self.returns = np.reshape(self.returns, (self.numTrial, numEpisodes))
 		# print (self.returns.shape)
-		plt.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0), ecolor='gray')
+		plt.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0)/2, ecolor='gray',label='1 standard deviation')
 		# plt.yscale('log')
-		plt.show()
+		plt.xlabel('Num Episodes')
+		plt.ylabel('Return')
+		if show:
+			plt.show()
+		plt.savefig(filename)
 
 class CartPoleEvaluation:
 	def __init__ (self, k:int):
@@ -86,14 +90,18 @@ class CartPoleEvaluation:
 	    print("Mean Return ", np.mean(G))
 	    return np.mean(G)
 
-	def plot(self):
+	def plot(self, filename:str="plot.png", show:bool=False):
 		numEpisodes = len(self.returns[0])
 		# print (self.numTrial, numEpisodes)
 		self.returns = np.reshape(self.returns, (self.numTrial, numEpisodes))
 		# print (self.returns.shape)
-		plt.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0), ecolor='gray')
+		plt.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0)/2, ecolor='gray',label='1 standard deviation')
 		# plt.yscale('log')
-		plt.show()
+		plt.xlabel('Num Episodes')
+		plt.ylabel('Return')
+		if show:
+			plt.show()
+		plt.savefig(filename)
 
 class GAInit:
 	def __init__(self, numParameters:int):

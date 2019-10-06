@@ -44,7 +44,7 @@ def problem1():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot()
+    policyEval.plot('learningCurve_gridworld_CEM.png')
 
 def problem2():
     """
@@ -75,7 +75,7 @@ def problem2():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot()
+    policyEval.plot('learningCurve_gridworld_FCHC.png')
 
 def problem3():
     """
@@ -113,7 +113,7 @@ def problem3():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot()
+    policyEval.plot('learningCurve_gridworld_GA.png')
 
 
 def problem4():
@@ -153,7 +153,7 @@ def problem4():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot()
+    policyEval.plot('learningCurve_cartpole_CEM.png')
 
 def problem5():
     """
@@ -168,7 +168,7 @@ def problem5():
     m = 4
     numActions = 2
 
-    numTrials = 1
+    numTrials = 50
     numIters = 200
     numEps = 10
 
@@ -186,7 +186,7 @@ def problem5():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot()
+    policyEval.plot('learningCurve_cartpole_FCHC.png')
 
 def problem6():
     """
@@ -203,7 +203,7 @@ def problem6():
     numActions = 2
 
     # Policy Search Params
-    numTrials = 1
+    numTrials = 50
     numGenerations = 100
     populationSize = 30
     numEpisodes = 20
@@ -225,16 +225,16 @@ def problem6():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot()
+    policyEval.plot('learningCurve_cartpole_GA.png')
 
 def main():
     np.random.seed(123)
-    # problem1()
+    problem1()
     # problem2()
     # problem3()
     # problem4()
     # problem5()
-    problem6()
+    # problem6()
     
     #TODO
     pass
