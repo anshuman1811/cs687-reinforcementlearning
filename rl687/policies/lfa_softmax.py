@@ -1,6 +1,7 @@
 import numpy as np
 from .skeleton import Policy
 from typing import Union
+from itertools import product
 
 class SoftmaxWithLFA(Policy):
     """
@@ -48,6 +49,31 @@ class SoftmaxWithLFA(Policy):
         else:
             return self.getActionProbabilities(state)[action]
 
+    def getNormalizedState(self, state:np.ndarray):
+        normalizedState = np.zeros_like(state)
+        # x
+        normalizedState[0] = (state[0]+3.0)/(6.0)
+        # v
+        normalizedState[1] = (state[1]+4.5)/(9.0)
+        # theta
+        normalizedState[2] = (state[2]+(np.pi/12.0))/(np.pi/6.0)
+        # omega
+        normalizedState[3] = (state[3]+4.0)/(8.0)
+        # if np.any(normalizedState<0) or np.any(normalizedState>1):
+        #     print ("State", state, "\nNormalized State", normalizedState)
+        return normalizedState
+
+
+    def getStateFeatures(self, state:np.ndarray):
+        # print ("Getting Features for ", state)
+        normalizedState = self.getNormalizedState(state)
+        fourierBasisMask = np.array(list(product(np.arange(self.k+1), repeat=4)))
+        # print (fourierBasisMask)
+        # print ("Fourier Basis Mask ", fourierBasisMask.shape)
+        fourierBasis = np.cos(np.sum(fourierBasisMask*normalizedState, axis=1))
+        # print ("Fourier Basis ", fourierBasis.shape)
+        return fourierBasis
+
     def samplAction(self, state:np.ndarray)->int:
         """
         Samples an action to take given the state provided. 
@@ -71,7 +97,9 @@ class SoftmaxWithLFA(Policy):
         """
 
         #TODO
-        probabilities = self._theta.dot(state)
+        features = self.getStateFeatures(state)
+        # print("Features", features.shape)
+        probabilities = self._theta.dot(features)
         probabilities -= np.max(probabilities)
         # print ("Action", probabilities)
         return np.exp(probabilities)/np.sum(np.exp(probabilities))
