@@ -69,7 +69,7 @@ class Cartpole(Environment):
         """
         Compute the next state of the pendulum using the euler approximation to the dynamics
         """
-        print (action)
+        # print (self._t, action)
         F = self.Fmag
         if action == 0:
             F = -self.Fmag
@@ -83,7 +83,7 @@ class Cartpole(Environment):
         self._theta = self._theta + self._dt * dtheta
         self._dtheta = self._dtheta + self._dt * domega
         self._state = np.array([self._x, self._v, self._theta, self._dtheta])
-        print (self._state)
+        # print (self._state)
 
         return self._state
 
@@ -94,6 +94,7 @@ class Cartpole(Environment):
         """
         takes one step in the environment and returns the next state, reward, and if it is in the terminal state
         """
+        # print("Stepping")
         oldState = self._state
         nextState = self.nextState(self._state, action)
 
@@ -105,6 +106,7 @@ class Cartpole(Environment):
         reward = self.R (oldState, action, nextState)
         self._reward += reward
         
+        # print("Current Accumulated reward = ", self._reward)
         return (nextState, reward, self._isEnd)
 
     def reset(self) -> None:
@@ -120,5 +122,5 @@ class Cartpole(Environment):
             pole falls |theta| > (pi/12.0)
             cart hits the sides |x| >= 3
         """
-        print (self._t, self._x, self._theta, (self._t > 20 or abs(self._x)>=3 or abs(self._theta) > np.pi/12.0))
+        # print (self._t, self._x, self._theta, (self._t > 20 or abs(self._x)>=3 or abs(self._theta) > np.pi/12.0))
         return (self._t >= 20 or abs(self._x) >= 3 or abs(self._theta) > np.pi/12.0)

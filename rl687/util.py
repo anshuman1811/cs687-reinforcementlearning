@@ -1,5 +1,6 @@
 import numpy as np
 from rl687.policies.tabular_softmax import TabularSoftmax
+from rl687.policies.lfa_softmax import SoftmaxWithLFA
 import matplotlib.pyplot as plt
 from rl687.environments.gridworld import Gridworld
 from rl687.environments.cartpole import Cartpole
@@ -52,32 +53,46 @@ class GridworldEvaluation:
 		plt.show()
 
 class CartPoleEvaluation:
-	def __init__ (self):
+	def __init__ (self, k:int):
+		self.policy = SoftmaxWithLFA(4, 2, k)
 		self.returns = []
-		self.policyParams = []
+		self.curTrialReturns = []
+		self.numTrial = 0
+		self.k = k
+
+	def endTrial(self):
+		print ("Incrementing Num Trial", self.numTrial)
+		self.numTrial += 1
+		self.returns.append(np.array(self.curTrialReturns))
+		self.curTrialReturns = []
 
 	def __call__(self, policy:np.array, numEpisodes:int):
 	    print("Evaluating Cartpole")
 	    G = []
-	    self.policyParams = policy
 	    env = Cartpole()
+	    self.policy.parameters = policy
 	    for ep in range (numEpisodes):
 	        # print("Episode ", ep)
 	        env.reset()
 	        Gi = 0
 	        while not env.isEnd:
 	            state = env.state
-	            action = np.random.choice([0,1])
-	            _, next_state, reward = env.step(action)
+	            action = self.policy.samplAction(state)
+	            next_state, reward, _ = env.step(action)
 	            Gi += reward
-	        self.returns.append(Gi)
+	        self.curTrialReturns.append(Gi)
 	        G.append(Gi)
 
 	    print("Mean Return ", np.mean(G))
 	    return np.mean(G)
 
 	def plot(self):
-		plt.plot(np.arange(len(self.returns)), self.returns)
+		numEpisodes = len(self.returns[0])
+		# print (self.numTrial, numEpisodes)
+		self.returns = np.reshape(self.returns, (self.numTrial, numEpisodes))
+		# print (self.returns.shape)
+		plt.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0), ecolor='gray')
+		# plt.yscale('log')
 		plt.show()
 
 class GAInit:

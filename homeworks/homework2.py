@@ -58,7 +58,7 @@ def problem2():
     num_states = 25
     num_actions = 4
 
-    numTrials = 1
+    numTrials = 50
     numIters = 1000
     numEps = 100
 
@@ -130,26 +130,28 @@ def problem4():
     #TODO
     print ("Problem 4")
 
-    numStates = 25
-    numActions = 4
+    m = 4
+    numActions = 2
 
+    numTrials = 50
     numEps = 10
     numIters = 50
-    popSize = 25
+    popSize = 20
     numElite = 5
-    epsilon = 1.5
-    sigma = 1.25
 
-    policyEval = CartPoleEvaluation()
-    agent = CEM(np.zeros(numStates*numActions), sigma, popSize, numElite, numEps, policyEval, epsilon)
+    epsilon = 1.25
+    sigma = 0.25
+    k=3
+    policyEval = CartPoleEvaluation(k=k)
+    # print ("Size of theta = ", numActions*np.power(k+1, m))
+    agent = CEM(np.zeros(numActions*np.power(k+1, m)), sigma, popSize, numElite, numEps, policyEval, epsilon)
 
-    returnsOverTrials = []
-    numTrials = 1
     for trial in range (numTrials):
         print ("Trial ", trial)
         for it in range(numIters) :            
             print("Iteration ", it)
             agent.train()
+        policyEval.endTrial()
         agent.reset()
     policyEval.plot()
 
@@ -161,7 +163,30 @@ def problem5():
     
     """
     #TODO
-    pass
+    print ("Problem 5")
+
+    m = 4
+    numActions = 2
+
+    numTrials = 1
+    numIters = 200
+    numEps = 10
+
+    sigma = 0.8
+    k=3
+    policyEval = CartPoleEvaluation(k=k)
+
+    print("Trials: %d\nIterations: %d\nEpisodes: %d\nSigma: %f" % (numTrials, numIters, numEps, sigma))
+
+    agent = FCHC(np.zeros(numActions*np.power(k+1, m)), sigma, policyEval, numEpisodes = numEps)
+    for trial in range (numTrials):
+        print("Trial ", trial)
+        for it in range(numIters):            
+            print("Iteration ", it)
+            agent.train()
+        policyEval.endTrial()
+        agent.reset()
+    policyEval.plot()
 
 def problem6():
     """
@@ -171,14 +196,45 @@ def problem6():
     """
     
     #TODO
-    pass
+    print ("Problem 6")
+
+    # Environment Params
+    m = 4
+    numActions = 2
+
+    # Policy Search Params
+    numTrials = 1
+    numGenerations = 100
+    populationSize = 30
+    numEpisodes = 20
+
+    numElite = 20
+    numTruncate = 5
+    alpha = 1.25
+    k=3
+    policyEval = CartPoleEvaluation(k=k)
+    initGA = GAInit(numActions*np.power(k+1, m))
+
+    # print("Trials: %d\nIterations: %d\nEpisodes: %d\nSigma: %f" % (numTrials, numIters, numEps, sigma))
+
+    agent = GA(populationSize, policyEval, initGA, numElite=numElite, numTruncate=numTruncate, alpha=alpha, numEpisodes = numEpisodes)
+    for trial in range(numTrials):
+        print("Trial ", trial)
+        for gen in range(numGenerations):
+            print("Generation ", gen)
+            agent.train()
+        policyEval.endTrial()
+        agent.reset()
+    policyEval.plot()
 
 def main():
     np.random.seed(123)
     # problem1()
     # problem2()
-    problem3()
+    # problem3()
     # problem4()
+    # problem5()
+    problem6()
     
     #TODO
     pass
