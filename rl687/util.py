@@ -4,6 +4,7 @@ from rl687.policies.lfa_softmax import SoftmaxWithLFA
 import matplotlib.pyplot as plt
 from rl687.environments.gridworld import Gridworld
 from rl687.environments.cartpole import Cartpole
+from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
 
 class GridworldEvaluation:
 	def __init__ (self):
@@ -43,18 +44,28 @@ class GridworldEvaluation:
 	    print("Mean Return ", np.mean(G))
 	    return np.mean(G)
 
-	def plot(self, filename:str="plot.png", show:bool=False):
+	def plot(self, filename:str="plot.png", title:str="plot", show:bool=False):
+		fig, ax = plt.subplots()
 		numEpisodes = len(self.returns[0])
 		# print (self.numTrial, numEpisodes)
 		self.returns = np.reshape(self.returns, (self.numTrial, numEpisodes))
 		# print (self.returns.shape)
-		plt.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0)/2, ecolor='gray',label='1 standard deviation')
+		ax.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0)/2, ecolor='gray', label='1 standard deviation')
 		# plt.yscale('log')
-		plt.xlabel('Num Episodes')
-		plt.ylabel('Return')
+		ax.set_xlabel('Num Episodes')
+		ax.set_ylabel('Return')
+
+		ax.xaxis.set_major_locator(MultipleLocator(500))
+		ax.xaxis.set_minor_locator(AutoMinorLocator(5))
+		ax.yaxis.set_major_locator(MultipleLocator(5))
+		ax.yaxis.set_minor_locator(AutoMinorLocator(5))
+		ax.grid(True, which='major', linestyle='-', linewidth='0.5', color='black')
+		ax.grid(True, which='minor', linestyle=':', linewidth='0.2', color='red')
+		ax.legend(loc=4)
 		if show:
-			plt.show()
-		plt.savefig(filename)
+			ax.show()
+		fig.suptitle(title, fontsize=10)
+		fig.savefig(filename)
 
 class CartPoleEvaluation:
 	def __init__ (self, k:int):
@@ -90,18 +101,28 @@ class CartPoleEvaluation:
 	    print("Mean Return ", np.mean(G))
 	    return np.mean(G)
 
-	def plot(self, filename:str="plot.png", show:bool=False):
+	def plot(self, filename:str="plot.png", title:str="plot", show:bool=False):
+		fig, ax = plt.subplots()
 		numEpisodes = len(self.returns[0])
 		# print (self.numTrial, numEpisodes)
 		self.returns = np.reshape(self.returns, (self.numTrial, numEpisodes))
 		# print (self.returns.shape)
-		plt.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0)/2, ecolor='gray',label='1 standard deviation')
+		ax.errorbar(np.arange(numEpisodes), np.mean(self.returns, axis=0), yerr=np.std(self.returns, axis=0)/2, ecolor='gray', label='1 standard deviation')
 		# plt.yscale('log')
-		plt.xlabel('Num Episodes')
-		plt.ylabel('Return')
+		ax.set_xlabel('Num Episodes')
+		ax.set_ylabel('Return')
+
+		ax.xaxis.set_major_locator(MultipleLocator(500))
+		ax.xaxis.set_minor_locator(AutoMinorLocator(5))
+		ax.yaxis.set_major_locator(MultipleLocator(5))
+		ax.yaxis.set_minor_locator(AutoMinorLocator(5))
+		ax.grid(True, which='major', linestyle='-', linewidth='0.5', color='black')
+		ax.grid(True, which='minor', linestyle=':', linewidth='0.2', color='red')
+		ax.legend(loc=4)
 		if show:
-			plt.show()
-		plt.savefig(filename)
+			ax.show()
+		fig.suptitle(title, fontsize=10)
+		fig.savefig(filename)
 
 class GAInit:
 	def __init__(self, numParameters:int):

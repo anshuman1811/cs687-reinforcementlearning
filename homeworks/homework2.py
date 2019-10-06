@@ -26,7 +26,7 @@ def problem1():
     numStates = 25
     numActions = 4
 
-    numTrials = 5
+    numTrials = 50
     numIters = 50
     numEps = 20
     popSize = 50
@@ -44,7 +44,7 @@ def problem1():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_gridworld_CEM.png')
+    policyEval.plot('learningCurve_gridworld_CEM.png', "Learning Curve - Gridworld with CEM Agent")
 
 def problem2():
     """
@@ -75,7 +75,7 @@ def problem2():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_gridworld_FCHC.png')
+    policyEval.plot('learningCurve_gridworld_FCHC.png', "Learning Curve - Gridworld with FCHC Agent")
 
 def problem3():
     """
@@ -113,7 +113,7 @@ def problem3():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_gridworld_GA.png')
+    policyEval.plot('learningCurve_gridworld_GA.png', "Learning Curve - Gridworld with GA Agent")
 
 
 def problem4():
@@ -153,7 +153,7 @@ def problem4():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_cartpole_CEM.png')
+    policyEval.plot('learningCurve_cartpole_CEM.png', "Learning Curve - Cartpole with CEM Agent")
 
 def problem5():
     """
@@ -186,7 +186,7 @@ def problem5():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_cartpole_FCHC.png')
+    policyEval.plot('learningCurve_cartpole_FCHC.png', "Learning Curve - Cartpole with FCHC Agent")
 
 def problem6():
     """
@@ -225,16 +225,16 @@ def problem6():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_cartpole_GA.png')
+    policyEval.plot('learningCurve_cartpole_GA.png', "Learning Curve - Cartpole with GA Agent")
 
 def main():
     np.random.seed(123)
     problem1()
-    # problem2()
-    # problem3()
-    # problem4()
-    # problem5()
-    # problem6()
+    problem2()
+    problem3()
+    problem4()
+    problem5()
+    problem6()
     
     #TODO
     pass
