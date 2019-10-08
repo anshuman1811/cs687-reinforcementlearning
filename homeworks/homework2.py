@@ -27,13 +27,13 @@ def problem1():
     numActions = 4
 
     numTrials = 50
-    numIters = 50
-    numEps = 20
-    popSize = 50
+    numIters = 150
+    numEps = 25
+    popSize = 20
 
     numElite = 10
     epsilon = 1.5
-    sigma = 0.1
+    sigma = 0.25
     policyEval = GridworldEvaluation()
     agent = CEM(np.zeros(numStates*numActions), sigma, popSize, numElite, numEps, policyEval, epsilon)
 
@@ -136,11 +136,11 @@ def problem4():
     numTrials = 50
     numEps = 10
     numIters = 50
-    popSize = 20
+    popSize = 10
     numElite = 5
 
     epsilon = 1.25
-    sigma = 0.25
+    sigma = 0.5
     k=3
     policyEval = CartPoleEvaluation(k=k)
     # print ("Size of theta = ", numActions*np.power(k+1, m))
@@ -169,10 +169,10 @@ def problem5():
     numActions = 2
 
     numTrials = 50
-    numIters = 200
-    numEps = 10
+    numIters = 100
+    numEps = 50
 
-    sigma = 0.8
+    sigma = 0.1
     k=3
     policyEval = CartPoleEvaluation(k=k)
 
@@ -204,13 +204,13 @@ def problem6():
 
     # Policy Search Params
     numTrials = 50
-    numGenerations = 100
-    populationSize = 30
-    numEpisodes = 20
+    numGenerations = 20
+    populationSize = 20
+    numEpisodes = 10
 
-    numElite = 20
+    numElite = 10
     numTruncate = 5
-    alpha = 1.25
+    alpha = 0.5
     k=3
     policyEval = CartPoleEvaluation(k=k)
     initGA = GAInit(numActions*np.power(k+1, m))
@@ -230,15 +230,11 @@ def problem6():
 def main():
     np.random.seed(123)
     problem1()
-    problem2()
-    problem3()
-    problem4()
-    problem5()
-    problem6()
-    
-    #TODO
-    pass
-
+    # problem2()
+    # problem3()
+    # problem4()
+    # problem5()
+    # problem6()
 
 if __name__ == "__main__":
     main()
