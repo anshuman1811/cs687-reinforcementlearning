@@ -1,6 +1,6 @@
 import numpy as np
 from .bbo_agent import BBOAgent
-
+from multiprocessing import Pool
 from typing import Callable
 
 
@@ -59,12 +59,32 @@ class CEM(BBOAgent):
     def train(self)->np.ndarray:
         #TODO
         print("----Training----")
-        returns = []
-        for k in range(self.popSize):
-            theta = np.random.multivariate_normal(self._theta, self._Sigma)
-            # print (self._parameters, new_theta)
-            J = self.evaluationFunction(theta, self.numEpisodes)
-            returns.append((theta, J))
+        # print ("Creating Pool")
+        threadPool = Pool(self.popSize)
+        # print ("Evaluating in parallel")
+        population = [np.random.multivariate_normal(self._theta, self._Sigma) for i in range(self.popSize)]
+        returns = threadPool.starmap(self.evaluationFunction, [(candidate, self.numEpisodes) for candidate in population])
+        # print("Returns", returns)
+        # print ("Threads completed")
+        returns = [(population[i], J) for i,J in enumerate(returns)]
+        # threadPool.close()
+        # threadPool.join()
+        # for candidate,J in returns:
+        #     print ("Evaluating Candidate")
+        #     # J = self.evaluationFunction(candidate, self.numEpisodes)
+        #     print ("Return", J)
+        #     # returns.append ((candidate, J))
+        #     if J > self.bestReturn:
+        #         print ("Better Policy Found!")
+        #         self.bestReturn = J
+        #         self._parameters = candidate
+
+        # returns = []
+        # for k in range(self.popSize):
+        #     theta = np.random.multivariate_normal(self._theta, self._Sigma)
+        #     # print (self._parameters, new_theta)
+        #     J = self.evaluationFunction(theta, self.numEpisodes)
+        #     returns.append((theta, J))
         
         # print("Returns", returns)
         topReturns = sorted(returns, key=lambda tup:tup[1], reverse = True)[:self.numElite]

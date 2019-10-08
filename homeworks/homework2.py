@@ -44,7 +44,7 @@ def problem1():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_gridworld_CEM.png', "Learning Curve - Gridworld with CEM Agent")
+        policyEval.plot('learningCurve_gridworld_CEM_{}.png'.format(trial), "Learning Curve - Gridworld with CEM Agent")
 
 def problem2():
     """
@@ -59,10 +59,10 @@ def problem2():
     num_actions = 4
 
     numTrials = 50
-    numIters = 1000
-    numEps = 100
+    numIters = 100
+    numEps = 50
 
-    sigma = 0.8
+    sigma = 1
     policyEval = GridworldEvaluation()
 
     print("Trials: %d\nIterations: %d\nEpisodes: %d\nSigma: %f" % (numTrials, numIters, numEps, sigma))
@@ -75,7 +75,7 @@ def problem2():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_gridworld_FCHC.png', "Learning Curve - Gridworld with FCHC Agent")
+        policyEval.plot('learningCurve_gridworld_FCHC_{}.png'.format(trial), "Learning Curve - Gridworld with FCHC Agent")
 
 def problem3():
     """
@@ -113,7 +113,7 @@ def problem3():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_gridworld_GA.png', "Learning Curve - Gridworld with GA Agent")
+        policyEval.plot('learningCurve_gridworld_GA_{}.png'.format(trial), "Learning Curve - Gridworld with GA Agent")
 
 
 def problem4():
@@ -153,7 +153,7 @@ def problem4():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_cartpole_CEM.png', "Learning Curve - Cartpole with CEM Agent")
+        policyEval.plot('learningCurve_cartpole_CEM_{}.png'.format(trial), "Learning Curve - Cartpole with CEM Agent")
 
 def problem5():
     """
@@ -186,7 +186,7 @@ def problem5():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_cartpole_FCHC.png', "Learning Curve - Cartpole with FCHC Agent")
+        policyEval.plot('learningCurve_cartpole_FCHC_{}.png'.format(trial), "Learning Curve - Cartpole with FCHC Agent")
 
 def problem6():
     """
@@ -210,7 +210,7 @@ def problem6():
 
     numElite = 10
     numTruncate = 5
-    alpha = 0.5
+    alpha = 0.1
     k=3
     policyEval = CartPoleEvaluation(k=k)
     initGA = GAInit(numActions*np.power(k+1, m))
@@ -225,14 +225,14 @@ def problem6():
             agent.train()
         policyEval.endTrial()
         agent.reset()
-    policyEval.plot('learningCurve_cartpole_GA.png', "Learning Curve - Cartpole with GA Agent")
+        policyEval.plot('learningCurve_cartpole_GA_{}.png'.format(trial), "Learning Curve - Cartpole with GA Agent")
 
 def main():
     np.random.seed(123)
-    problem1()
+    # problem1()
     # problem2()
     # problem3()
-    # problem4()
+    problem4()
     # problem5()
     # problem6()
 
