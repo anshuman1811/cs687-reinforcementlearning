@@ -1,6 +1,9 @@
 import numpy as np
 from .bbo_agent import BBOAgent
+
 from typing import Callable
+
+
 class GA(BBOAgent):
     """
     A canonical Genetic Algorithm (GA) for policy search is a black box 
@@ -23,6 +26,7 @@ class GA(BBOAgent):
                     to be copied (unmodified) to the next generation
     
     """
+
     def __init__(self, populationSize:int, evaluationFunction:Callable, 
                  initPopulationFunction:Callable, numElite:int=1, numTruncate:int=1, alpha:float=0.5, numEpisodes:int=10):
         print ("Init")
@@ -38,15 +42,6 @@ class GA(BBOAgent):
         self.numEpisodes = numEpisodes
         self.initPopulationFunction = initPopulationFunction
 
-        for candidate in self._population:
-            print ("Evaluating Candidate")
-            J = self.evaluationFunction(candidate, self.numEpisodes)
-            print ("Return", J)
-            if J > self.bestReturn:
-                print ("Better Policy Found!")
-                self.bestReturn = J
-                self._parameters = candidate
-        print (self._population, self._parameters, self.bestReturn)
         # for candidate in self._population:
         #     print ("Evaluating Candidate")
         #     J = self.evaluationFunction(candidate, self.numEpisodes)
@@ -104,17 +99,13 @@ class GA(BBOAgent):
         print("Sorting Candidates")
         sortedCandidates = [candidate[0] for candidate in sorted(returns, key=lambda tup:tup[1], reverse=True)]
         print("Getting Parents")
-
         parents = self.getParents(self.numTruncate, sortedCandidates)
-        
         print("Extracting Elite Candidates")
         elite = sortedCandidates[:self.numElite]
         # print(len(elite))
-        
         print("Getting Children")
         children = self.getChildren(self.alpha, parents)
         # print (len(children))
-        
         self._population[:self.numElite] = elite
         self._population[self.numElite:] = children
         print ("New Population", len(self._population), self._population[0].shape)
@@ -126,3 +117,11 @@ class GA(BBOAgent):
         self._population = self.initPopulationFunction(self.populationSize)
         self._parameters = np.zeros_like(self._population[1])
         self.bestReturn = -np.inf
+        # for candidate in self._population:
+        #     print ("Evaluating Candidate")
+        #     J = self.evaluationFunction(candidate, self.numEpisodes)
+        #     print ("Return", J)
+        #     if J > self.bestReturn:
+        #         print ("Better Policy Found!")
+        #         self.bestReturn = J
+        #         self._parameters = candidate
