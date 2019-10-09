@@ -12,7 +12,6 @@ class GridworldEvaluation:
 	def __init__ (self):
 		self.returns = []
 		self.curTrialReturns = []
-		self.policy = TabularSoftmax(25, 4)
 		self.numTrial = 0
 		# self.lock = Condition()
 		print("New Gridworld Eval")
@@ -26,11 +25,11 @@ class GridworldEvaluation:
 		# self.lock.release()
 		self.curTrialReturns = []
 
-	def __call__(self, policy:np.array, numEpisodes:int):
+	def __call__(self, parameters:np.array, numEpisodes:int):
 	    # print("Evaluating Gridworld")
 	    G = []
 	    policy=TabularSoftmax(25, 4)
-	    policy.parameters = policy
+	    policy.parameters = parameters
 	    env = Gridworld()
 	    for ep in range (numEpisodes):
 	        # print("Episode ", ep)
@@ -76,7 +75,6 @@ class GridworldEvaluation:
 
 class CartPoleEvaluation:
 	def __init__ (self, k:int):
-		self.policy = SoftmaxWithLFA(4, 2, k)
 		self.returns = []
 		self.curTrialReturns = []
 		self.numTrial = 0
