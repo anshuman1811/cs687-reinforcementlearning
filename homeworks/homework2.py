@@ -135,12 +135,12 @@ def problem4():
 
     numTrials = 50
     numEps = 10
-    numIters = 50
+    numIters = 30
     popSize = 10
     numElite = 5
 
     epsilon = 1.25
-    sigma = 0.5
+    sigma = 0.1
     k=3
     policyEval = CartPoleEvaluation(k=k)
     # print ("Size of theta = ", numActions*np.power(k+1, m))
@@ -229,12 +229,12 @@ def problem6():
 
 def main():
     np.random.seed(123)
-    # problem1()
-    # problem2()
-    # problem3()
+    problem1()
+    problem2()
+    problem3()
     problem4()
-    # problem5()
-    # problem6()
+    problem5()
+    problem6()
 
 if __name__ == "__main__":
     main()

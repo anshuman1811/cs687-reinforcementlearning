@@ -1,6 +1,6 @@
 import numpy as np
 from .bbo_agent import BBOAgent
-from multiprocessing import Pool
+from multiprocessing.dummy import Pool
 from typing import Callable
 
 
@@ -86,6 +86,8 @@ class GA(BBOAgent):
         threadPool.close()
         threadPool.join()
         for candidate,J in returns:
+        # returns = []
+        # for candidate in self._population:
             # print ("Evaluating Candidate")
             # J = self.evaluationFunction(candidate, self.numEpisodes)
             # print ("Return", J)
