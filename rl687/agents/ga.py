@@ -52,6 +52,7 @@ class GA(BBOAgent):
     @property
     def parameters(self)->np.ndarray:
         #TODO
+        print("Quering params")
         return self._parameters
 
     def _mutate(self, parent:np.ndarray)->np.ndarray:
