@@ -77,21 +77,21 @@ class GA(BBOAgent):
         returns = []
         print ("Training")
         # print ("Creating Pool")
-        threadPool = Pool(self.populationSize)
+        # threadPool = Pool(self.populationSize)
         # print ("Evaluating in parallel")
-        returns = threadPool.starmap(self.evaluationFunction, [(candidate, self.numEpisodes) for candidate in self._population])
+        # returns = threadPool.starmap(self.evaluationFunction, [(candidate, self.numEpisodes) for candidate in self._population])
         # print("Returns", returns)
         # print ("Threads completed")
-        returns = [(self._population[i], J) for i,J in enumerate(returns)]
-        threadPool.close()
-        threadPool.join()
-        for candidate,J in returns:
-        # returns = []
-        # for candidate in self._population:
-            # print ("Evaluating Candidate")
-            # J = self.evaluationFunction(candidate, self.numEpisodes)
-            # print ("Return", J)
-            # returns.append ((candidate, J))
+        # returns = [(self._population[i], J) for i,J in enumerate(returns)]
+        # threadPool.close()
+        # threadPool.join()
+        # for candidate,J in returns:
+        returns = []
+        for candidate in self._population:
+            print ("Evaluating Candidate")
+            J = self.evaluationFunction(candidate, self.numEpisodes)
+            print ("Return", J)
+            returns.append ((candidate, J))
             if J > self.bestReturn:
                 print ("Better Policy Found!")
                 self.bestReturn = J
