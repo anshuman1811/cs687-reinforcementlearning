@@ -166,7 +166,7 @@ VectorXd valueIteration(const MDP& M, const bool & print = false, const double& 
 //                        cout << "Dot product\n" << (M.P[s]*vCur).rows() << ","
 //                                              << (M.P[s]*vCur).cols() << endl;
 //                        cout << "R(s)\n" << M.R.transpose().rows() << "," << M.R.transpose().cols() << endl;
-			vNew[s] = (M.R.row(s).transpose() + M.gamma*M.P[s]*vCur).maxCoeff();
+			vNew[s] = (M.R.transpose().col(s) + M.gamma*M.P[s]*vCur).maxCoeff();
 		}
 
 		// Check for termination. Take element-wise absolute value of (vNew-vCur). If the max element is <= epsilon, we are done.
