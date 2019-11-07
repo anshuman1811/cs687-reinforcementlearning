@@ -111,8 +111,8 @@ void runCartPole() {
 	CartPole e;
 	double gamma = 1.0;
 	//													alpha		gamma	epsilon	iOrder	dOrder
-	QLearning a1(e.getStateDim(), e.getNumActions(),	0.01,	0.99,		0.1,		3,		2);
-	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.01,			0.99,		0.1,	3,		2);
+	QLearning a1(e.getStateDim(), e.getNumActions(),	0.05,	0.9,		0.05,		3,		2);
+	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.01,			0.9,		0.05,	3,		2);
 	vector<double> means1, vars1, means2, vars2;
 	runExperiment(a1, e, numTrials, numEpisodes, maxEpisodeLength, gamma, generator, means1, vars1);
 	runExperiment(a2, e, numTrials, numEpisodes, maxEpisodeLength, gamma, generator, means2, vars2);
