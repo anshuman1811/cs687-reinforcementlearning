@@ -26,22 +26,32 @@ void Sarsa::train(std::mt19937_64 & generator,
           phiInit = true;
         }
 
-        double tdError = r - dot(w[a],phi);
-        if (!sPrimeTerminal) {
-          phiPrime = fb.basify(sPrime);		// Get phi(sPrime)
-          int aPrime = getAction(sPrime, generator);
-          tdError += gamma*dot(w[aPrime],phiPrime);
+        double tdError = 0;
+        if (prevAction != -1){
+          tdError = prevR + gamma*dot(w[a],phi) - dot(w[prevAction],prevPhi);
+          for (int i=0; i<numFeatures; i++)
+            w[prevAction][i] += alpha*tdError*prevPhi[i];
         }
 
-        for (int i=0; i<numFeatures; i++)
-          w[a][i] += alpha*tdError*phi[i];
+        if (!sPrimeTerminal) {
+          phiPrime = fb.basify(sPrime);		// Get phi(sPrime)
+        }
+        else{
+          tdError = r - dot(w[a],phi);
+          for (int i=0; i<numFeatures; i++)
+            w[a][i] += alpha*tdError*phi[i];
+        }
 
+        prevPhi = phi;
+        prevAction = a;
+        prevR = r;
         phi = phiPrime;
 }
 
 // When a new episode starts, do you need to clear any of your variables, or set any of your flags to true/false?
 void Sarsa::newEpisode(mt19937_64 & generator) {
   phiInit = false;
+  prevAction=-1;
 }
 
 // This is identical to the getAction function in QLearning. You shouldn't have to change this.

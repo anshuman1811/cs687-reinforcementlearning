@@ -79,8 +79,8 @@ void runMountainCar() {
 	// Create the two agents. The arguments here are the hyperparameters that you must tune! The ones we provide you below
 	// are bad first examples.
 	//													alpha		gamma	epsilon	iOrder	dOrder
-	QLearning a1(e.getStateDim(), e.getNumActions(),	0.005,	0.99,		0.2,		3,		2);
-	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.005,			0.99,		0.25,	3,		2);
+	QLearning a1(e.getStateDim(), e.getNumActions(),	0.005,	0.99,		0.1,		3,		2);
+	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.005,			0.99,		0.1,	3,		2);
 	
 	// Run each agent on the mountain car environment using the runEnvironment function (see above for a description of what it stores in the last
 	// two arguments (means and vars).
@@ -111,8 +111,8 @@ void runCartPole() {
 	CartPole e;
 	double gamma = 1.0;
 	//													alpha		gamma	epsilon	iOrder	dOrder
-	QLearning a1(e.getStateDim(), e.getNumActions(),	0.05,	0.9,		0.05,		3,		2);
-	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.01,			0.9,		0.05,	3,		2);
+	QLearning a1(e.getStateDim(), e.getNumActions(),	0.01,	0.9,		0.05,		3,		2);
+	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.01,			0.99,		0.1,	3,		2);
 	vector<double> means1, vars1, means2, vars2;
 	runExperiment(a1, e, numTrials, numEpisodes, maxEpisodeLength, gamma, generator, means1, vars1);
 	runExperiment(a2, e, numTrials, numEpisodes, maxEpisodeLength, gamma, generator, means2, vars2);
@@ -136,7 +136,7 @@ void runAcrobot() {
 	Acrobot e;
 	//													alpha		gamma	epsilon	iOrder	dOrder
 	QLearning a1(e.getStateDim(), e.getNumActions(),	0.001,	0.99,		0.1,		4,		3);
-	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.001,			0.99,		0.1,	4,		3);
+	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.001,			0.99,		0.01,	4,		3);
 	vector<double> means1, vars1, means2, vars2;
 	runExperiment(a1, e, numTrials, numEpisodes, maxEpisodeLength, gamma, generator, means1, vars1);
 	runExperiment(a2, e, numTrials, numEpisodes, maxEpisodeLength, gamma, generator, means2, vars2);
@@ -155,12 +155,12 @@ void runAcrobot() {
 // See runMountainCar: This is the same thing, but for the Gridworld environment.
 void runGridworld() {
 	mt19937_64 generator(0);
-	int numTrials = 100, numEpisodes = 50, maxEpisodeLength = 1000;
+	int numTrials = 100, numEpisodes = 20, maxEpisodeLength = 1000;
 	double gamma = 1;
 	Gridworld e;
 	//													alpha		gamma	epsilon	iOrder	dOrder
-	QLearning a1(e.getStateDim(), e.getNumActions(),	0.01,	0.99,		0.05,		1,		0);
-	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.01,			0.99,		0.05,	1,		0);
+	QLearning a1(e.getStateDim(), e.getNumActions(),	0.05,	0.99,		0.001,		1,		0);
+	Sarsa a2(e.getStateDim(), e.getNumActions(),		0.05,			0.99,		0.001,	1,		0);
 	// HINT: Above, do not change iOrder and dOrder. These settings, combined with how the Gridworld is implemented,
 	// result in the agents using a tabular representation, which is great for Gridworlds!
 	vector<double> means1, vars1, means2, vars2;
@@ -181,10 +181,10 @@ void runGridworld() {
 // Entry point for the program. We won't use the arguments this time.
 int main(int argc, char * argv[])
 {
-//	cout << "Starting Mountain Car runs..." << endl;
-//	runMountainCar();	// Run the mountain car experiments (see the function above). The lines below are similar, but for other MDPs.
-	cout << "\tDone.\nStarting Cart Pole runs..." << endl;
-	runCartPole();
+	cout << "Starting Mountain Car runs..." << endl;
+	runMountainCar();	// Run the mountain car experiments (see the function above). The lines below are similar, but for other MDPs.
+//	cout << "\tDone.\nStarting Cart Pole runs..." << endl;
+//	runCartPole();
 //	cout << "\tDone.\nStarting Acrobot runs..." << endl;
 //	runAcrobot();
 //	cout << "\tDone.\nStarting Gridworld runs..." << endl;

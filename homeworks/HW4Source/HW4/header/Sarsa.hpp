@@ -18,7 +18,9 @@ private:
 	std::uniform_int_distribution<int> d2;
 
         bool phiInit = false;
-        std::vector<double> phi, phiPrime;
+        std::vector<double> prevPhi, phi, phiPrime;
+        double prevR;
+        int prevAction = -1;
 	// HERE: You may want to add additional member variables, perhaps storing previous states, features, actions, and/or rewards,
 	// along with Boolean flags indicating if they have been initialized.
 };
