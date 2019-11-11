@@ -63,18 +63,172 @@ Point allocations for this assignment will be determined at the time of grading,
 
 \begin{enumerate}
     \item Describe the process of implementing Q-Learning. Did everything work immediately? Did you have bugs that you had to fix? What were they?
+    \\\\
+    \textcolor{blue}{
+		To implement Q-learning, I had to implement the TD update by calculating the TDError in the train method using the following formulation:\\
+		$\delta = r - gamma*\max_{a \in \mathcal{A}}(q(s',a')) + q(s,a)$\\
+		$\max_{a \in \mathcal{A}}(q(s',a')) = maxQ(\phi(s'))$ \\
+		$q(s,a) = w[a] . \phi(s)$\\
+		I then updated the weight for action $a$ as follows:\\
+		$w[a][i] += \alpha*\delta*\phi[i]$ $\forall i $\\
+		I was able to get everything working immediately and there were no bugs in the code.
+	}
+
     \item Describe the process of implementing Sarsa. Did everything work immediately? Did you have bugs that you had to fix? What were they?
+    \\\\
+    \textcolor{blue}{
+    	Implementation of Sarsa was more nuanced. The TD Error required both $a$ and $a'$ but sampling $a'$ inside the train method lead to mismatch in the action used during the update and the action used to interact with the environment in the runExperiment method which would sample the action again. I kept a variable to track the previous action ($prevAction$), previous reward ($prevR$)as well as the previous value of $\phi(s)$ ($prevPhi$) and updated the weights for the action in the subsequent call to train. I had to skip this update in the very first call to train. I also had to handle the case of $s'$ being terminal separately in order to additionally update the weights for action $a$. Updates were made using the following formulation:\\
+    	$\delta = r - gamma*q(s,a) + q(prevState,prevAction)$\\
+    	$q(s,a) = w[a].\phi(s) = w[a].phi $\\
+    	$q(prevState,prevAction) = w[prevAction] . prevPhi$\\
+    	I then updated the weight for action $prevAction$ as follows:\\
+    	$w[prevAction][i] += \alpha*\delta*prevPhi[i]$ $\forall i $\\
+    	Additionally, when $s'$ was terminal, the following update would also be made for action $a$:\\
+    	$w[a][i] += \alpha*\delta*phi[i]$ $\forall i $\\
+       	I was able to get everything working immediately and there were no bugs in the code.
+    }
+
     \item Describe the process of optimizing the hyperparameters for Q-Learning for MountainCar, and report the final hyperparameters that you found.
+    \\\\
+    \textcolor{blue}{
+    	The final hyperparameters found were :\\
+    	$
+    	\alpha  = 0.005,
+    	\gamma = 0.99,
+    	\epsilon = 0.1,
+    	iOrder = 3,
+    	dOrder = 2
+    	$\\
+    	I started with $iOrder$ of 3 as I had used a $3^{rd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually them. Increasing $\epsilon$ improved the learning but the increasing $\alpha$ seemed to cause divergence where the algorithm would suddenly stop learning and returns would go down. I then kept the value of $\alpha$ small and increased $\epsilon$ till the algorithm converged. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
+    }
+
     \item Describe the process of optimizing the hyperparameters for Q-Learning for CartPole, and report the final hyperparameters that you found.
+    \\\\
+    \textcolor{blue}{
+    	The final hyperparameters found were :\\
+    	$
+    	\alpha  = 0.01,
+    	\gamma = 0.9,
+    	\epsilon = 0.05,
+    	iOrder = 3,
+    	dOrder = 2
+    	$\\
+    	I started with $iOrder$ of 3 as I had used a $3^{rd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually increased $\epsilon$ till the algorithm converged without having to increase $\alpha$. Increasing $\epsilon$ also increased the standard deviation in the result. Increasing $\epsilon$ increased the standard deviation in the result. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.9$ worked well.
+    }
+
     \item Describe the process of optimizing the hyperparameters for Q-Learning for Acrobot, and report the final hyperparameters that you found.
+    \\\\
+    \textcolor{blue}{
+    	The final hyperparameters found were :\\
+    	$
+    	\alpha  = 0.001,
+    	\gamma = 0.99,
+    	\epsilon = 0.1,
+    	iOrder = 4,
+    	dOrder = 3
+    	$\\
+    	Acrobot required a substantially higher order represtation. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and found the lower values worked better. I searched for values of $\alpha$ in the range of $1$ to $0.001$. I started with a high value of $\alpha$ and a low value of $\epsilon$ but the algorithm did not converge. I then started reducing the alpha and increasing $\epsilon$ to add more randomness to the process. Increasing $\epsilon$ increased the standard deviation in the result. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
+    }
+
     \item Describe the process of optimizing the hyperparameters for Q-Learning for Gridworld, and report the final hyperparameters that you found.
+    \\\\
+    \textcolor{blue}{
+    	The final hyperparameters found were :\\
+    	$
+    	\alpha  = 0.05,
+    	\gamma = 0.99,
+    	\epsilon = 0.001,
+    	iOrder = 1,
+    	dOrder = 0
+    	$\\
+    	As suggested, I did not change iOrder and dOrder to keep a tabular representation. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and found that lower values worked better. I searched for values of $\alpha$ in the range of $1$ to $0.001$ with very high values resulted in some quick high return values but then fell off and did not converge whereas very low values did not seem to learn fast enough and stayed at low return values. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
+    }
+
+
     \item Describe the process of optimizing the hyperparameters for Sarsa for MountainCar, and report the final hyperparameters that you found.
+    \\\\
+    \textcolor{blue}{
+    	The final hyperparameters found were :\\
+    	$
+    	\alpha  = 0.005,
+    	\gamma = 0.99,
+    	\epsilon = 0.1,
+    	iOrder = 3,
+    	dOrder = 2
+    	$\\
+    	I started with $iOrder$ of 3 as I had used a $3^{rd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually them. Increasing $\epsilon$ improved the learning but the increasing $\alpha$ seemed to cause divergence where the algorithm would suddenly stop learning and returns would go down. I then kept the value of $\alpha$ small and increased $\epsilon$ till the algorithm converged. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well. Surprisingly, the same values of hyperparameters that worked for Q-learning also worked for Sarsa.
+    }
+
     \item Describe the process of optimizing the hyperparameters for Sarsa for CartPole, and report the final hyperparameters that you found.
+    \\\\
+    \textcolor{blue}{
+    	The final hyperparameters found were :\\
+    	$
+    	\alpha  = 0.01,
+    	\gamma = 0.99,
+    	\epsilon = 0.1,
+    	iOrder = 3,
+    	dOrder = 2
+    	$\\
+    	I started with $iOrder$ of 3 as I had used a $3^{rd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually increased $\epsilon$ till the algorithm converged without having to increase $\alpha$. Increasing $\epsilon$ also increased the standard deviation in the result. Sarsa required a higher randomness factor than Q-learning. Increasing $\epsilon$ increased the standard deviation in the result. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
+    }
+
     \item Describe the process of optimizing the hyperparameters for Sarsa for Acrobot, and report the final hyperparameters that you found.
+    \\\\
+    \textcolor{blue}{
+    	The final hyperparameters found were :\\
+    	$
+    	\alpha  = 0.001,
+    	\gamma = 0.99,
+    	\epsilon = 0.01,
+    	iOrder = 4,
+    	dOrder = 3
+    	$\\
+    	Acrobot required a substantially higher order represtation. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$. I started with a high value of $\alpha$ and a low value of $\epsilon$ but the algorithm did not converge. I then started reducing the alpha and increasing $\epsilon$ to add more randomness to the process. Sarsa was able to converge with a smaller value of $\epsilon$ than Q-learning. Increasing $\epsilon$ increased the standard deviation in the result. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
+    }
+
     \item Describe the process of optimizing the hyperparameters for Sarsa for Gridworld, and report the final hyperparameters that you found.
+    \\\\
+    \textcolor{blue}{
+    	The final hyperparameters found were :\\
+    	$
+    		\alpha  = 0.05,
+    		\gamma = 0.99,
+    		\epsilon = 0.001,
+    		iOrder = 1,
+    		dOrder = 0
+    	$\\
+    	As suggested, I did not change iOrder and dOrder to keep a tabular representation. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and found that lower values worked better. I searched for values of $\alpha$ in the range of $1$ to $0.001$ with very high values resulted in some quick high return values but then fell off and did not converge whereas very low values did not seem to learn fast enough and stayed at low return values. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well. Surprisingly, the same hyperparameters that worked for Q-learning also worked for Sarsa.
+    }
+    
     \item Provide four plots, one per environment, showing the learning curves for Sarsa and Q-learning with the best hyperparameters that you found. Keep the number of trials, number of episodes, and maxEpisodeLength terms from the provided main.cpp. Include error bars showing one standard deviation. These plots can be created using any plotting software of your choice.
-    \item Compare your experiences with Q-Learning and Sarsa to your experiences with BBO. Which did you find easier to get working? Which algorithms learned fastest on Cart-Pole (in HW2, you implemented BOO algorithms for Cart-Pole)?
+    
+    \begin{figure}[h!]
+    	\hspace*{0.1\textwidth}\includegraphics[width=0.8\textwidth]{MountainCar.png}
+    	\label{fig: Learning Curve - Mountain Car}
+	\end{figure}
+	\begin{figure}
+		\hspace*{0.1\textwidth}\includegraphics[width=0.8\textwidth, ]{CartPole.png}
+		\label{fig: Learning Curve - CartPole}
+	\end{figure}
+	\begin{figure}
+		\hspace*{0.1\textwidth}\includegraphics[width=0.8\textwidth]{Acrobot.png}
+		\label{fig: Learning Curve - Acrobot}
+	\end{figure}
+	\begin{figure}
+		\hspace*{0.1\textwidth}\includegraphics[width=0.8\textwidth]{Gridworld.png}
+		\label{fig: Learning Curve - Gridworld}
+	\end{figure}
+    \pagebreak
+    \item Compare your experiences with Q-Learning and Sarsa to your experiences with BBO. Which did you find easier to get working? Which algorithms learned fastest on Cart-Pole (in HW2, you implemented BBO algorithms for Cart-Pole)?
+    \\\\
+	\textcolor{blue}{
+		Answer:\\
+		Q-learning and Sarsa were much easier to train and converged remarkably faster than BBO algorithms. BBO algorithms took several thousand episodes to converge while Sarsa just takes about 30 and Q-learning about 40 to converge on the Cart-Pole domain. Sarsa and Q-learning learned the fastest with Q-learning converging slightly slower than Sarsa but to a better policy. Sarsa seemed more sensitive to the hyperparameters than Q-learning.
+	}
+
     \item Be sure to submit your QLearning.hpp (even if it is unchanged, as recommended), QLearning.cpp, Sarsa.hpp, and Sarsa.cpp files with your write-up.
+    \textcolor{blue}{Submitted}
 \end{enumerate}
 
 Note: This code is written to be relatively simple, as many of you are new to C++. This does not represent best coding practices (e.g., we could make use of subclasses).
