@@ -183,10 +183,10 @@ int main(int argc, char * argv[])
 {
 	cout << "Starting Mountain Car runs..." << endl;
 	runMountainCar();	// Run the mountain car experiments (see the function above). The lines below are similar, but for other MDPs.
-//	cout << "\tDone.\nStarting Cart Pole runs..." << endl;
-//	runCartPole();
-//	cout << "\tDone.\nStarting Acrobot runs..." << endl;
-//	runAcrobot();
-//	cout << "\tDone.\nStarting Gridworld runs..." << endl;
-//	runGridworld();
+	cout << "\tDone.\nStarting Cart Pole runs..." << endl;
+	runCartPole();
+	cout << "\tDone.\nStarting Acrobot runs..." << endl;
+	runAcrobot();
+	cout << "\tDone.\nStarting Gridworld runs..." << endl;
+	runGridworld();
 }

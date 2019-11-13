@@ -99,7 +99,7 @@ Point allocations for this assignment will be determined at the time of grading,
     	iOrder = 3,
     	dOrder = 2
     	$\\
-    	I started with $iOrder$ of 3 as I had used a $3^{rd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually them. Increasing $\epsilon$ improved the learning but the increasing $\alpha$ seemed to cause divergence where the algorithm would suddenly stop learning and returns would go down. I then kept the value of $\alpha$ small and increased $\epsilon$ till the algorithm converged. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
+    	I started with $dOrder$ of 2 as I had used a $2^{nd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually them. Increasing $\epsilon$ improved the learning but the increasing $\alpha$ seemed to cause divergence where the algorithm would suddenly stop learning and returns would go down. I then kept the value of $\alpha$ small and increased $\epsilon$ till the algorithm converged. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
     }
 
     \item Describe the process of optimizing the hyperparameters for Q-Learning for CartPole, and report the final hyperparameters that you found.
@@ -113,7 +113,7 @@ Point allocations for this assignment will be determined at the time of grading,
     	iOrder = 3,
     	dOrder = 2
     	$\\
-    	I started with $iOrder$ of 3 as I had used a $3^{rd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually increased $\epsilon$ till the algorithm converged without having to increase $\alpha$. Increasing $\epsilon$ also increased the standard deviation in the result. Increasing $\epsilon$ increased the standard deviation in the result. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.9$ worked well.
+    	I started with $iOrder$ of 2 as I had used a $2^{nd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually increased $\epsilon$ till the algorithm converged without having to increase $\alpha$. Increasing $\epsilon$ also increased the standard deviation in the result. Increasing $\epsilon$ increased the standard deviation in the result. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.9$ worked well.
     }
 
     \item Describe the process of optimizing the hyperparameters for Q-Learning for Acrobot, and report the final hyperparameters that you found.
@@ -156,7 +156,7 @@ Point allocations for this assignment will be determined at the time of grading,
     	iOrder = 3,
     	dOrder = 2
     	$\\
-    	I started with $iOrder$ of 3 as I had used a $3^{rd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually them. Increasing $\epsilon$ improved the learning but the increasing $\alpha$ seemed to cause divergence where the algorithm would suddenly stop learning and returns would go down. I then kept the value of $\alpha$ small and increased $\epsilon$ till the algorithm converged. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well. Surprisingly, the same values of hyperparameters that worked for Q-learning also worked for Sarsa.
+    	I started with $iOrder$ of 2 as I had used a $2^{nd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually them. Increasing $\epsilon$ improved the learning but the increasing $\alpha$ seemed to cause divergence where the algorithm would suddenly stop learning and returns would go down. I then kept the value of $\alpha$ small and increased $\epsilon$ till the algorithm converged. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well. Surprisingly, the same values of hyperparameters that worked for Q-learning also worked for Sarsa.
     }
 
     \item Describe the process of optimizing the hyperparameters for Sarsa for CartPole, and report the final hyperparameters that you found.
@@ -170,7 +170,7 @@ Point allocations for this assignment will be determined at the time of grading,
     	iOrder = 3,
     	dOrder = 2
     	$\\
-    	I started with $iOrder$ of 3 as I had used a $3^{rd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually increased $\epsilon$ till the algorithm converged without having to increase $\alpha$. Increasing $\epsilon$ also increased the standard deviation in the result. Sarsa required a higher randomness factor than Q-learning. Increasing $\epsilon$ increased the standard deviation in the result. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
+    	I started with $dOrder$ of w as I had used a $2^{nd}$ order Fourier basis for the BBO implementations in the earlier homework. I searched for values of $\epsilon$ in the range of $0.1$ to $0.001$ and values of $\alpha$ in the range of $1$ to $0.001$.  I started with small values for both and then gradually increased $\epsilon$ till the algorithm converged without having to increase $\alpha$. Increasing $\epsilon$ also increased the standard deviation in the result. Sarsa required a higher randomness factor than Q-learning. Increasing $\epsilon$ increased the standard deviation in the result. I tried a few values of $\gamma$ ranging from $0.9$ to $0.999$ and found that $0.99$ worked well.
     }
 
     \item Describe the process of optimizing the hyperparameters for Sarsa for Acrobot, and report the final hyperparameters that you found.
