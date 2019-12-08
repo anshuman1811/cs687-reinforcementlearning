@@ -15,16 +15,21 @@ using namespace Eigen;
 
 class Policy{
 public:
-  Policy (int numActions, int stateTerms, unsigned seed);
-  Policy (VectorXd& theta_init, int numActions, int stateTerms, unsigned seed);
+  Policy (int numActions_, int stateTerms_, unsigned seed);
+  Policy (VectorXd& theta_init, int numActions_, int stateTerms_, unsigned seed);
+  Policy(Policy pi, unsigned seed);
   int getAction (const VectorXd& phi);
   double getActionProbability (const VectorXd& phi, int action) const;
-  VectorXd getParams();
+  VectorXd getTheta() const;
   void setTheta (const VectorXd& newTheta);
+  int getNumActions() const;
+  int getStateTerms() const;
 
 private:
   MatrixXd theta;
   default_random_engine gen;
+  int numActions;
+  int stateTerms;
 };
 
 #endif // CLION_POLICY_H

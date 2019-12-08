@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <random>
+using namespace std;
 
 // Cart-Pole MDP - see Gridworld.hpp for comments regarding the general structure of these environment/MDP objects
 class Cartpole {

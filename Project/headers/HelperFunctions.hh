@@ -94,12 +94,13 @@ VectorXd CMAES(
 			for (unsigned int i = 0; i < N; i++)
 				randomVector[i] = D[i] * distribution(generator);
 			arx.col(k) = xmean + sigma * B * randomVector;
-		}
+ 		}
 		// Evaluate the population
 		vector<VectorXd> fInputs(lambda);
 		for (unsigned int i = 0; i < lambda; i++) {
 		        cout << "Evaluating Candidate " << counteval+i << "/" << numIterations << endl;
 			fInputs[i] = arx.col(i);
+                        cout << "Theta: " << fInputs[i].transpose() << endl;
 			arfitness[i] = (minimize ? 1 : -1) * f(fInputs[i], params, generator);
 		}
 		// Update the population distribution

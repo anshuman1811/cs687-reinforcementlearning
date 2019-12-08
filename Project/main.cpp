@@ -17,6 +17,8 @@
 #include "headers/MathUtils.h"
 #include "headers/Policy.h"
 #include "headers/Cartpole.h"
+#include "headers/Gridworld.hpp"
+#include "headers/Walk.h"
 #include "headers/FourierBasis.h"
 #include "headers/HelperFunctions.hh"
 
@@ -137,7 +139,7 @@ VectorXd getCandidateSolution(
     const FourierBasis& fb,
     const double c,
     mt19937_64 & generator) {
-  VectorXd initialSolution = piE.getParams();    // Where should the search start? Let's just use the linear fit that we would get from ordinary least squares linear regression
+  VectorXd initialSolution = piE.getTheta();
   double initialSigma = 2.0*(initialSolution.dot(initialSolution) + 1.0); // A heuristic to select the width of the search based on the weight magnitudes we expect to see.
   int numIterations = 100;                          // Number of iterations that CMA-ES should run. Larger is better, but takes longer.
   bool minimize = false;                            // We want to maximize the candidate objective.
@@ -169,28 +171,70 @@ double getTarget(const vector<vector<HistoryElement>>& data){
       gammaCoeff *= gamma;
     }
     returns[e] = episodeReturn;
+//    if (data[e].size() > 10 || episodeReturn < -10)
+//      checkpoint();
   }
-  return 1.1*returns.mean();
+  double avgReturn = returns.mean();
+  return (avgReturn > 0 ? 1.1 : 0.9)*avgReturn;
 }
 
-void generateData(int numEpisodes, int maxEpisodeLength){
+template <typename Environment>
+double getAverageReturn(Environment& e, Policy& pi, int numEpisodes, int maxEpisodeLength, const FourierBasis& fb){
+//  Cartpole e;
+  mt19937_64 gen(0);
+  double gamma = 1.0;
+  VectorXd returns(numEpisodes);
+
+  for (int eps = 0; eps < numEpisodes; eps++){
+    double curGamma = 1.0;					// We plot the discounted return - this stores gamma^t, which starts at 1.
+    bool inTerminalState = false;			// We will use this flag to determine when we should terminate the loop below. If environment[trial].inTerminalState() is slow to call, this saves us from calling it a couple times. For our MDPs it really doesn't matter that we're doing this more efficiently.
+    e.newEpisode(gen);	// Reset the environment, telling it to start a new episode.
+    vector<double> state = e.getState(gen);	// Get the initial state.
+    double episodeReturn = 0.0;
+    for (int t = 0; (t < maxEpisodeLength) && (!inTerminalState); t++) { // Loop over time steps in the episode, stopping when we hit the max episode length or when we enter a terminal state.
+      vector<double> phi_vec = fb.basify(state);
+      VectorXd phi = VectorXd::Map(&phi_vec[0], phi_vec.size());
+      int action = pi.getAction(phi);
+      double reward = e.update(action, gen); // Apply the action by updating the environment with the chosen action, and get the resulting reward.
+
+      vector<double> nextState = e.getState(gen); // Get the resulting state of the environment from this transition
+      inTerminalState = e.inTerminalState(); // Store whether this is next-state is a terminal state.
+
+      episodeReturn += curGamma*reward;
+      state = nextState; // Prepare for the next iteration of the loop with this line and the next.
+      curGamma *= gamma;
+    }
+    returns[eps] = episodeReturn;
+  }
+  cout << "AvgReturn: " << returns.mean() << endl;
+  return returns.mean();
+}
+
+template <typename Environment>
+void generateData(Environment& e, int numEpisodes, int maxEpisodeLength, int order){
   cout << "Generating Data" << endl;
   // Generate Histories for some policy
   // Write to file
   ofstream out("../../../output/data.csv");
-  Cartpole e;
+//  Cartpole e;
   int stateDim = e.getStateDim();
-  int order = 3;
+//  int order = 3;
   int numActions = e.getNumActions();
   FourierBasis fb;
   fb.init(stateDim, 0, order);
+  mt19937_64 gen(0);
 
   out << stateDim << endl;
+//  cout << "StateDim in env " << stateDim << " " << e.getState(gen).size() << endl;
+//  checkpoint();
   out << numActions << endl;
   out << order << endl;
 
   Policy p(numActions, fb.getNumOutputs(), 1234);
-  VectorXd params = p.getParams();
+//  VectorXd params(numActions*fb.getNumOutputs());
+//  params << 0.452687,-0.123691,-0.187805,-0.0419247,-0.3103,0.0169222,-0.440849,0.171773,0.122356,-0.0208773,-0.377911,0.24458,-0.345339,0.221081,0.181478,0.0931315,0.316947,-0.237248,-0.0783118,0.102174,0.197309,0.0129477,0.237053,-0.283958,0.0931003,-0.159108,-0.11468,-0.0336945,-0.312665,0.0494717,-0.437631,0.185128,0.13921,0.124541,0.269549,-0.0445983,-0.311025,0.186034,0.181678,0.065481,0.311506,-0.245937,0.320217,-0.266973,-0.10468,-0.0398326,0.24824,-0.237777,0.0789096,-0.109312,-0.131987,-0.0215236,-0.190011,0.263565,-0.391198,0.144332,0.109239,0.0786274,0.245533,-0.0450382,0.407343,-0.221437,-0.0711912,-0.023617,0.332143,-0.184834,0.315291,-0.193174,-0.122204,-0.08163,-0.262694,0.218761,0.136993,-0.0538062,-0.220642,0.0300469,-0.256064,0.217929,-0.118554,0.118296,0.102564,0.289925,-0.14454,0.0308677,-0.036806,-0.119257,-0.000854144,-0.27288,0.174216,-0.101032,0.0331704,-0.236314,0.194932,-0.219322,0.183163,-0.00102567,0.0264519,0.160525,-0.151711,-0.0274355,0.101995,0.0911902,-0.0420769,0.179202,-0.249171,0.0371926,-0.122774,-0.0147314,-0.0374526,-0.1332,0.0527589,-0.267015,0.200302,-0.0525608,0.117418,0.0845154,-0.0264594,-0.182052,0.195832,0.0153543,0.0274128,0.176015,-0.22169,0.192534,-0.244502,0.0506698,-0.0728419,0.158957,-0.293461,-0.0106893,-0.141654,-0.00546437,0.0100509,-0.113205,0.273374,-0.185785,0.167286,-0.0742353,0.0805248,0.0537695,-0.0490843,0.207685,-0.225989,0.101884,-0.0554201,0.15327,-0.205815,0.138937,-0.206245,0.060542,-0.052369,-0.0965512,0.20772,-0.0393728,-0.0666479,-0.00757391,0.10165,-0.104987,0.26088,0.0429262,0.137972,-0.0754444;
+//  p.setTheta(params);
+  VectorXd params = p.getTheta();
   for (int i=0; i<params.size(); i++){
     out << params[i] << ",";
   }
@@ -198,9 +242,9 @@ void generateData(int numEpisodes, int maxEpisodeLength){
 
   out << numEpisodes << endl;
 
-  mt19937_64 gen(0);
   double gamma = 1.0;
 
+  vector<HistoryElement> firstEps;
   for (int eps = 0; eps < numEpisodes; eps++){
     double curGamma = 1.0;					// We plot the discounted return - this stores gamma^t, which starts at 1.
     bool inTerminalState = false;			// We will use this flag to determine when we should terminate the loop below. If environment[trial].inTerminalState() is slow to call, this saves us from calling it a couple times. For our MDPs it really doesn't matter that we're doing this more efficiently.
@@ -217,6 +261,9 @@ void generateData(int numEpisodes, int maxEpisodeLength){
       out << action << ",";
       out << reward;
 
+      if (eps == 0)
+        firstEps.push_back(HistoryElement(state, action, reward));
+
       vector<double> nextState = e.getState(gen); // Get the resulting state of the environment from this transition
       inTerminalState = e.inTerminalState(); // Store whether this is next-state is a terminal state.
 
@@ -229,27 +276,39 @@ void generateData(int numEpisodes, int maxEpisodeLength){
     out<<endl;
   }
 
+  for (int t=0; t<firstEps.size(); t++){
+    HistoryElement ht = firstEps[t];
+    vector<double> phi_vec = fb.basify(ht.state);
+    VectorXd phi = VectorXd::Map(&phi_vec[0], phi_vec.size());
+    out<< p.getActionProbability(phi, ht.action);
+    out << ((t==firstEps.size()-1) ? '\n' : ',');
+  }
+
   cout << "Data Generation Complete" << endl;
 }
 
 // Given a filename, load the file into an MDP, run sanity checks on this MDP, run value iteration, and print the result to a file.
 void run() {
 
-//  generateData(100000, 10);
+  int genEpisodes = 100000, genMaxEpisodeLength = 15, genOrder = 1;
+//  Cartpole genEnv;
+//  Gridworld genEnv;
+  Walk genEnv;
+//  generateData(genEnv, genEpisodes, genMaxEpisodeLength, genOrder);
 
   /*********************** End of Data Prep ***********************/
 
   cout << "Reading Data" << endl;
-//  ifstream in("../../../output/data.csv");
-  ifstream in("../../../input/data.csv");
+  ifstream in("../../../output/data.csv");
+//  ifstream in("../../../input/data.csv");
 
   int stateDim, numActions, order;
   in >> stateDim;
-//  cout << "stateDim: " << stateDim << endl;
+  cout << "stateDim: " << stateDim << endl;
   in >> numActions;
-//  cout << "numActions: " << numActions << endl;
+  cout << "numActions: " << numActions << endl;
   in >> order;
-//  cout << "order: " << order << endl;
+  cout << "order: " << order << endl;
 
   FourierBasis fb;
   fb.init(stateDim, 0, order);
@@ -260,11 +319,11 @@ void run() {
   cout << "Reading Policy" << endl;
   string s;
   for (int i=0; i<thetaB.size(); i++){
-      getline(in, s, ',');
+      char delim = (i == thetaB.size()-1 ? '\n': ',');
+      getline(in, s, delim);
       thetaB[i] = stod(s);
-//      cout << thetaB[i] << ",";
+      cout << thetaB[i] << delim;
   }
-  cout << endl;
   // Complete reading the line
 //  getline(in, s);
 
@@ -272,7 +331,7 @@ void run() {
 
   int numEpisodes;
   in >> numEpisodes;
-//  cout << "numEpisodes: " << numEpisodes << endl;
+  cout << "numEpisodes: " << numEpisodes << endl;
 
   vector<vector<HistoryElement> > data;
   for (int eps = 0; eps < numEpisodes; eps++){
@@ -309,6 +368,35 @@ void run() {
     data.push_back(episode);
   }
 
+  cout << "Validating Policy Representation" << endl;
+  string valPi;
+  in >> valPi;
+  stringstream ss(valPi);
+  VectorXd expectedPi(data[0].size());
+  VectorXd actualPi(data[0].size());
+  bool match = true;
+  for (int t=0; t<data[0].size(); t++){
+    HistoryElement ht = data[0][t];
+    vector<double> phi_vec = fb.basify(ht.state);
+    VectorXd phi = VectorXd::Map(&phi_vec[0], phi_vec.size());
+    actualPi[t] = piB.getActionProbability(phi, ht.action);
+
+    string s;
+    getline(ss, s, ',');
+//    cout << s << ", ";
+    expectedPi[t] = stod(s);
+
+    if (abs(expectedPi[t] - actualPi[t]) > 1e-5)
+      match = false;
+  }
+
+  if (!match){
+    cout << "Policies Dont Match!"  << endl;
+    cout << "Expected: " << expectedPi.transpose() << endl;
+    cout << "Actual: " << actualPi.transpose() << endl;
+    return;
+  }
+
   cout << "Data Read Complete" << endl;
 
   /*********************** End of Data Read ***********************/
@@ -317,47 +405,71 @@ void run() {
   vector<vector<HistoryElement> > Ds, Dc;
   splitData(data, Dc, Ds, 0.6);
 
-  int numPolicies = 10;
-  vector<Policy> policies;
+  int numPolicies = 20;
 
   mt19937_64 generator(123);
   double target = getTarget(data);
-  double delta = 0.1;
+  cout << "Target: " << target << endl;
+  double delta = 0.05;
   Policy piE(numActions, fb.getNumOutputs(), 123);
 
+//  VectorXd theta(numActions*fb.getNumOutputs());
+//  theta << 1, 1, 0.01, -0.01;
+//  piE.setTheta(theta);
+//  VectorXd pdis = PDIS(data, piE, piB, 1.0, fb);
+//  cout << "PDIS " << pdis.mean() << endl;
+//
+//  pdis = PDIS(data, piB, piB, 1.0, fb);
+//  cout << "PDIS " << pdis.mean() << endl;
+//
+//  cout << "Mean Return in Data " << target/1.1 << endl;
+//  checkpoint();
+
   // Loop while more policies need to be found
-  while(policies.size() < numPolicies){
-    //   Select Candidate Policy
-    VectorXd candidate = getCandidateSolution(
-          Dc,
-          delta,
-          Ds.size(),
-          piE,
-          piB,
-          fb,
-          target,
-          generator);
+//  ofstream policyOut("../../../output/result.csv");
 
-    cout << "Generated Candidate" << endl;
-    piE.setTheta(candidate);
-    //   Store Candidate Policy if Test Passed
-    if (candidatePassesTest(Ds, piE, piB, fb, delta, target)){
-      cout << "****************** CANDIDATE PASSED TEST ******************" << endl;
-      policies.push_back(piE);
-    } else
-      cout << "****************** CANDIDATE FAILED TEST ******************" << endl;
-    checkpoint();
-  }
+  vector<Policy> policies(numPolicies, Policy(piB));
+  #pragma omp parallel for
+  for (int p=0; p<numPolicies; p++){
+//  while(policies.size() < numPolicies){
+    bool passedTest = false;
+    VectorXd candidate;
+    while(!passedTest) {
+      //   Select Candidate Policy
+      policies[p].setTheta(piB.getTheta());
+      candidate = getCandidateSolution(Dc, delta, Ds.size(), policies[p], piB,
+                                                fb, target, generator);
 
-  // Write the policies to result
-  ofstream policyOut("../../../output/result.csv");
-  for (auto policy : policies){
-    VectorXd params = policy.getParams();
-    for (int i=0; i<params.size(); i++){
-      policyOut << params[i] << ",";
+      cout << "Generated Candidate" << endl;
+      policies[p].setTheta(candidate);
+
+      passedTest = candidatePassesTest(Ds, policies[p], piB, fb, delta, target);
+      if (passedTest)
+        cout << "****************** CANDIDATE PASSED TEST ******************" << endl;
+      else
+        cout << "****************** CANDIDATE FAILED TEST ******************" << endl;
     }
-    policyOut << endl;
+    //   Store Candidate Policy if Test Passed
+      ofstream policyOut("../../../result/95_" + to_string(p) + ".csv");
+      for (int i=0; i<candidate.size(); i++){
+        policyOut << candidate[i];
+        policyOut << (i == candidate.size()-1 ? "\n":",") << flush;
+        cout << candidate[i];
+        cout << (i == candidate.size()-1 ? "\n":",");
+      }
+    //checkpoint()
   }
+
+  // Validate policies found
+  cout << "Validating Result Policies" << endl;
+  int worked = 0;
+  for (auto policy : policies){
+    double avgReturn = getAverageReturn(genEnv, policy, genEpisodes, genMaxEpisodeLength, fb);
+    if (avgReturn >= target/1.1)
+      worked++;
+  }
+
+  cout << "Reality Check! #Policies that worked: " << worked << "/" << policies.size() << endl;
 }
 
 int main(int argc, char* argv[])
