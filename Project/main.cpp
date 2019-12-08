@@ -287,30 +287,93 @@ void generateData(Environment& e, int numEpisodes, int maxEpisodeLength, int ord
   cout << "Data Generation Complete" << endl;
 }
 
-// Given a filename, load the file into an MDP, run sanity checks on this MDP, run value iteration, and print the result to a file.
-void run() {
+vector<Policy> HCOPE(
+    vector<vector<HistoryElement>>& data,
+    const int numPolicies,
+    const double delta,
+    const double target,
+    const Policy& piB,
+    const FourierBasis& fb,
+    const string outputDir){
+  // Split Data into Ds and Dc
+  vector<vector<HistoryElement> > Ds, Dc;
+  double dataSplitRatio = 0.6;
+  splitData(data, Dc, Ds, dataSplitRatio);
 
-  int genEpisodes = 100000, genMaxEpisodeLength = 15, genOrder = 1;
-//  Cartpole genEnv;
-//  Gridworld genEnv;
-  Walk genEnv;
-//  generateData(genEnv, genEpisodes, genMaxEpisodeLength, genOrder);
+//  int numPolicies = 100;
 
-  /*********************** End of Data Prep ***********************/
+  mt19937_64 generator(123);
+  cout << "Target: " << target << endl;
+//  Policy piE(numActions, fb.getNumOutputs(), 123);
+//  Policy piE (piB, 123);
 
+//  VectorXd theta(numActions*fb.getNumOutputs());
+//  theta << 1, 1, 0.01, -0.01;
+//  piE.setTheta(theta);
+//  VectorXd pdis = PDIS(data, piE, piB, 1.0, fb);
+//  cout << "PDIS " << pdis.mean() << endl;
+//
+//  pdis = PDIS(data, piB, piB, 1.0, fb);
+//  cout << "PDIS " << pdis.mean() << endl;
+//
+//  cout << "Mean Return in Data " << target/1.1 << endl;
+//  checkpoint();
+
+  // Loop while more policies need to be found
+//  ofstream policyOut("../../../output/result.csv");
+
+  vector<Policy> policies(numPolicies, Policy(piB, 123));
+  #pragma omp parallel for
+  for (int p=0; p<numPolicies; p++){
+//  while(policies.size() < numPolicies){
+    bool passedTest = false;
+    VectorXd candidate;
+    while(!passedTest) {
+      //   Select Candidate Policy
+      policies[p].setTheta(piB.getTheta());
+      candidate = getCandidateSolution(Dc, delta, Ds.size(), policies[p], piB,
+                                       fb, target, generator);
+
+      cout << "Generated Candidate" << endl;
+      policies[p].setTheta(candidate);
+
+      passedTest = candidatePassesTest(Ds, policies[p], piB, fb, delta, target);
+      if (passedTest)
+        cout << "****************** CANDIDATE PASSED TEST ******************" << endl;
+      else
+        cout << "****************** CANDIDATE FAILED TEST ******************" << endl;
+    }
+    //   Store Candidate Policy if Test Passed
+    ofstream policyOut(outputDir + to_string(p) + ".csv");
+    for (int i=0; i<candidate.size(); i++){
+      policyOut << candidate[i];
+      policyOut << (i == candidate.size()-1 ? "\n":",") << flush;
+      cout << candidate[i];
+      cout << (i == candidate.size()-1 ? "\n":",");
+    }
+    //checkpoint()
+  }
+  return policies;
+}
+
+void readData(
+    string filename,
+    int& stateDim,
+    int& numActions,
+    int& order,
+    Policy& piB,
+    int& numEpisodes,
+    FourierBasis& fb,
+    vector<vector<HistoryElement> >& data){
   cout << "Reading Data" << endl;
-  ifstream in("../../../output/data.csv");
+//  ifstream in("../../../output/data.csv");
 //  ifstream in("../../../input/data.csv");
+  ifstream in(filename);
 
-  int stateDim, numActions, order;
   in >> stateDim;
-  cout << "stateDim: " << stateDim << endl;
   in >> numActions;
-  cout << "numActions: " << numActions << endl;
   in >> order;
-  cout << "order: " << order << endl;
 
-  FourierBasis fb;
   fb.init(stateDim, 0, order);
 
   VectorXd thetaB(numActions*fb.getNumOutputs());
@@ -319,21 +382,18 @@ void run() {
   cout << "Reading Policy" << endl;
   string s;
   for (int i=0; i<thetaB.size(); i++){
-      char delim = (i == thetaB.size()-1 ? '\n': ',');
-      getline(in, s, delim);
-      thetaB[i] = stod(s);
-      cout << thetaB[i] << delim;
+    char delim = (i == thetaB.size()-1 ? '\n': ',');
+    getline(in, s, delim);
+    thetaB[i] = stod(s);
+//    cout << thetaB[i] << delim;
   }
   // Complete reading the line
 //  getline(in, s);
 
-  Policy piB(thetaB, numActions, fb.getNumOutputs(), 123);
+  piB = Policy(thetaB, numActions, fb.getNumOutputs(), 123);
 
-  int numEpisodes;
   in >> numEpisodes;
-  cout << "numEpisodes: " << numEpisodes << endl;
 
-  vector<vector<HistoryElement> > data;
   for (int eps = 0; eps < numEpisodes; eps++){
     vector<HistoryElement> episode;
 //    cout << "Reading Episode " << eps << endl;
@@ -394,82 +454,79 @@ void run() {
     cout << "Policies Dont Match!"  << endl;
     cout << "Expected: " << expectedPi.transpose() << endl;
     cout << "Actual: " << actualPi.transpose() << endl;
+    checkpoint();
     return;
   }
 
   cout << "Data Read Complete" << endl;
+}
+
+void run() {
+
+  bool test = true;
+
+  /****************************************************************/
+
+  bool genData = false;
+  int genEpisodes = 100000, genMaxEpisodeLength = 15, genOrder = 1;
+//  Cartpole genEnv;
+  Gridworld genEnv;
+//  Walk genEnv;
+  if (test && genData)
+    generateData(genEnv, genEpisodes, genMaxEpisodeLength, genOrder);
+
+  /*********************** End of Data Prep ***********************/
+
+  int stateDim, numActions, order, numEpisodes;
+  Policy piB(0,0,0);
+  FourierBasis fb;
+  vector<vector<HistoryElement> > data;
+  if (test)
+    readData("../../../output/data.csv", stateDim, numActions, order, piB, numEpisodes, fb, data);
+  else
+    readData("../../../input/data.csv", stateDim, numActions, order, piB, numEpisodes, fb, data);
+
+  cout << "stateDim: " << stateDim << endl;
+  cout << "numActions: " << numActions << endl;
+  cout << "order: " << order << endl;
+  cout << "Policy: " << piB.getTheta().transpose() << endl;
+  cout << "numEpisodes: " << numEpisodes << endl;
 
   /*********************** End of Data Read ***********************/
 
-  // Split Data into Ds and Dc
-  vector<vector<HistoryElement> > Ds, Dc;
-  splitData(data, Dc, Ds, 0.6);
+//  VectorXd testTheta(piB.getTheta().size());
+//  testTheta << 0.33304397, -1.3536084, -0.391217, -2.93140976, -4.07265164, -2.13137546, -1.94398795, 2.53769193;
+//  Policy testPolicy (piB);
+//  testPolicy.setTheta(testTheta);
+//  double avgReturn = getAverageReturn(genEnv, testPolicy, genEpisodes, genMaxEpisodeLength, fb);
+//  return;
 
-  int numPolicies = 20;
+  /********************* End of Testing Space *********************/
 
-  mt19937_64 generator(123);
-  double target = getTarget(data);
-  cout << "Target: " << target << endl;
+  int numPolicies = 50;
   double delta = 0.05;
-  Policy piE(numActions, fb.getNumOutputs(), 123);
+  double target = getTarget(data);
+  string outputDir;
+  if (test)
+    outputDir = "../../../result/" + to_string(delta) + "_";
+  else
+    outputDir = "../../../final_result/";
+  vector<Policy> policies = HCOPE(data, numPolicies, delta, target, piB, fb, outputDir);
 
-//  VectorXd theta(numActions*fb.getNumOutputs());
-//  theta << 1, 1, 0.01, -0.01;
-//  piE.setTheta(theta);
-//  VectorXd pdis = PDIS(data, piE, piB, 1.0, fb);
-//  cout << "PDIS " << pdis.mean() << endl;
-//
-//  pdis = PDIS(data, piB, piB, 1.0, fb);
-//  cout << "PDIS " << pdis.mean() << endl;
-//
-//  cout << "Mean Return in Data " << target/1.1 << endl;
-//  checkpoint();
+  /********************* End of Policy Search *********************/
 
-  // Loop while more policies need to be found
-//  ofstream policyOut("../../../output/result.csv");
-
-  vector<Policy> policies(numPolicies, Policy(piB));
-  #pragma omp parallel for
-  for (int p=0; p<numPolicies; p++){
-//  while(policies.size() < numPolicies){
-    bool passedTest = false;
-    VectorXd candidate;
-    while(!passedTest) {
-      //   Select Candidate Policy
-      policies[p].setTheta(piB.getTheta());
-      candidate = getCandidateSolution(Dc, delta, Ds.size(), policies[p], piB,
-                                                fb, target, generator);
-
-      cout << "Generated Candidate" << endl;
-      policies[p].setTheta(candidate);
-
-      passedTest = candidatePassesTest(Ds, policies[p], piB, fb, delta, target);
-      if (passedTest)
-        cout << "****************** CANDIDATE PASSED TEST ******************" << endl;
-      else
-        cout << "****************** CANDIDATE FAILED TEST ******************" << endl;
-    }
-    //   Store Candidate Policy if Test Passed
-      ofstream policyOut("../../../result/95_" + to_string(p) + ".csv");
-      for (int i=0; i<candidate.size(); i++){
-        policyOut << candidate[i];
-        policyOut << (i == candidate.size()-1 ? "\n":",") << flush;
-        cout << candidate[i];
-        cout << (i == candidate.size()-1 ? "\n":",");
+  if (test) {
+      // Validate policies found
+      cout << "Validating Result Policies" << endl;
+      int worked = 0;
+      for (auto policy : policies){
+        double avgReturn = getAverageReturn(genEnv, policy, genEpisodes, genMaxEpisodeLength, fb);
+        if (avgReturn >= target/1.1)
+          worked++;
       }
-    //checkpoint()
-  }
 
-  // Validate policies found
-  cout << "Validating Result Policies" << endl;
-  int worked = 0;
-  for (auto policy : policies){
-    double avgReturn = getAverageReturn(genEnv, policy, genEpisodes, genMaxEpisodeLength, fb);
-    if (avgReturn >= target/1.1)
-      worked++;
+      cout << "Reality Check! #Policies that worked: " << worked << "/" << policies.size() << endl;
   }
-
-  cout << "Reality Check! #Policies that worked: " << worked << "/" << policies.size() << endl;
 }
 
 int main(int argc, char* argv[])

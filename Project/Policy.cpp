@@ -18,7 +18,7 @@ Policy::Policy (int numActions_, int stateTerms_, unsigned seed){
   // init theta
   numActions = numActions_;
   stateTerms = stateTerms_;
-  theta = MatrixXd(numActions, stateTerms);
+  theta = MatrixXd(stateTerms, numActions);
   //  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   gen = default_random_engine (seed);
 //  cout << "Theta after " << theta.size() << endl;
@@ -29,7 +29,7 @@ Policy::Policy (VectorXd& theta_init, int numActions_, int stateTerms_, unsigned
   stateTerms = stateTerms_;
 //  cout << "Initializing with theta " << theta_init.size() << endl;
 //  cout << "Theta before " << theta.size() << endl;
-  theta = MatrixXd::Map(theta_init.data(), numActions, stateTerms);
+  theta = MatrixXd::Map(theta_init.data(),  stateTerms, numActions);
 //  cout << "Theta after " << theta.size() << endl;
   gen = default_random_engine (seed);
 }
@@ -37,7 +37,7 @@ Policy::Policy (VectorXd& theta_init, int numActions_, int stateTerms_, unsigned
 Policy::Policy(Policy pi, unsigned seed){
   numActions = pi.getNumActions();
   stateTerms = pi.getStateTerms();
-  theta = MatrixXd::Map(pi.getTheta().data(), numActions, stateTerms);
+  theta = MatrixXd::Map(pi.getTheta().data(), stateTerms, numActions);
   gen = default_random_engine (seed);
 }
 
@@ -63,7 +63,9 @@ int Policy::getStateTerms() const{
 // Softmax Action Selection with Linear Function Approximation
 int Policy::getAction (const VectorXd& phi){
 //  cout << "Getting Action" << endl;
-//  cout << "Phi " << phi << endl;
+//  cout << phi.cols() << "x" << phi.rows() << "dot" << theta.rows() << "x" << theta.cols()  << endl;
+//  cout << "Phi " << phi.transpose() << endl;
+//  cout << "Theta\n " << theta << endl;
   VectorXd dot = phi.transpose()*theta;
   VectorXd q = exp(dot.array() - dot.maxCoeff());
 //  cout << "q " << q << endl;
@@ -76,9 +78,9 @@ int Policy::getAction (const VectorXd& phi){
 
 double Policy::getActionProbability (const VectorXd& phi, int action) const {
 //  cout << "Getting Action Probability";
-//  cout << theta.rows() << "x" << theta.cols() << "dot" << phi.rows() << "x" << phi.cols() << endl;
+//  cout << phi.cols() << "x" << phi.rows() << "dot" << theta.rows() << "x" << theta.cols()  << endl;
 //  cout << "Phi " << phi.transpose() << endl;
-//  cout << "theta " << theta << endl;
+//  cout << "Theta\n" << theta << endl;
   VectorXd dot = phi.transpose()*theta;
 //  cout << "dot " << dot.transpose() << endl;
   VectorXd q = exp(dot.array() - dot.maxCoeff());
